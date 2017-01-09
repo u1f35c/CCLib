@@ -621,10 +621,6 @@ class CC254X(ChipDriver):
             cLow = fWordOffset & 0xFF
             self.writeXDATA(0x6271, [cLow, cHigh])
 
-            # Debug
-            # print "[@%04x: p=%i, ofs=%04x, %02x:%02x]" % (fAddr, fPage, fWordOffset, cHigh, cLow),
-            # sys.stdout.flush()
-
             # Check if we should erase page first
             if erase:
                 # Select the page to erase using FADDRH[7:1]
