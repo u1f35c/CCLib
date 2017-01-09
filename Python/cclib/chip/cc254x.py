@@ -530,6 +530,11 @@ class CC254X(ChipDriver):
         WARNING: This requires DMA operations to be unpaused ( use: self.pauseDMA(False) )
         """
 
+        # Pad data so that the start and end address are on 4-byte boundaries.
+        data = b"\xff" * (offset % 4) + data
+        data = data + b"\xff" * (-len(data) % 4)
+        offset -= offset % 4
+
         # Prepare DMA-0 for DEBUG -> RAM (using DBG_BW trigger)
         self.configDMAChannel(
             0,
