@@ -614,13 +614,6 @@ class CC254X(ChipDriver):
             fAddr = offset + iOfs
             fPage = int(fAddr / self.flashPageSize)
 
-            # Calculate FLASH address High/Low bytes
-            # for writing (addressable as 32-bit words)
-            fWordOffset = int(fAddr / 4)
-            cHigh = (fWordOffset >> 8) & 0xFF
-            cLow = fWordOffset & 0xFF
-            self.writeXDATA(0x6271, [cLow, cHigh])
-
             # Check if we should erase page first
             if erase:
                 # Select the page to erase using FADDRH[7:1]
@@ -636,6 +629,13 @@ class CC254X(ChipDriver):
                 # Wait until flash is not busy any more
                 while self.isFlashBusy():
                     time.sleep(0.010)
+
+            # Calculate FLASH address High/Low bytes
+            # for writing (addressable as 32-bit words)
+            fWordOffset = int(fAddr / 4)
+            cHigh = (fWordOffset >> 8) & 0xFF
+            cLow = fWordOffset & 0xFF
+            self.writeXDATA(0x6271, [cLow, cHigh])
 
             # Upload to FLASH through DMA-1
             self.armDMAChannel(1)
