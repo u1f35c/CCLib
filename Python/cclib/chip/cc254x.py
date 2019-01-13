@@ -110,17 +110,7 @@ class CC254X(ChipDriver):
         # Setup DPTR
         a = self.instri(0x90, offset)  # MOV DPTR,#data16
 
-        # Prepare ans array
-        ans = bytearray()
-
-        # Read bytes
-        for i in range(0, size):
-            a = self.instr(0xE0)  # MOVX A,@DPTR
-            ans.append(a)
-            a = self.instr(0xA3)  # INC DPTR
-
-        # Return ans
-        return ans
+        return bytearray(self.burstReadCode(size))
 
     def writeXDATA(self, offset, bytes):
         """

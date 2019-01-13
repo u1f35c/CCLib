@@ -41,6 +41,7 @@ CMD_HALT = 0x0F
 CMD_PING = 0xF0
 CMD_INSTR_VER = 0xF1
 CMD_INSTR_UPD = 0xF2
+CMD_BURSTRD = 0xF3
 
 # Response constants
 ANS_OK = 0x01
@@ -358,6 +359,34 @@ class CCLibProxy:
         # Handle response & update debug status
         self.debugStatus = self.readFrame()
         return self.debugStatus
+
+    def burstReadCode(self, length):
+        """
+        Perform a burst-read operation that reads from XCODE
+        """
+
+        bufferSize = 2048
+        # Validate length
+        if length > bufferSize:
+            raise IOError(f"Invalid size of burst read: {length}, max {bufferSize}")
+
+        # Split length in high/low order bytes
+        cHigh = (length >> 8) & 0xFF
+        cLow = length & 0xFF
+
+        # Prepare for burst read
+        ans = self.sendFrame(CMD_BURSTRD, cHigh, cLow)
+        if ans != ANS_READY:
+            raise IOError(
+                "Unable to prepare for burst-read! (Unknown response 0x%02x)" % ans
+            )
+
+        data = self.ser.read(length)
+
+        self.readFrame(raiseException=True)
+
+        return data
+
 
     def chipErase(self):
         """
