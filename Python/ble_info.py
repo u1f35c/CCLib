@@ -17,7 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import print_function
-from cclib import hexdump, renderDebugStatus, renderDebugConfig, getOptions, openCCDebugger
+from cclib import (
+    hexdump,
+    renderDebugStatus,
+    renderDebugConfig,
+    getOptions,
+    openCCDebugger,
+)
 from cclib.extensions.bluegiga import BlueGigaCCDebugger
 import sys
 import os
@@ -27,7 +33,9 @@ opts = getOptions("BlueGiga-Specific CCDebugger Information Tool")
 
 # Open debugger
 try:
-    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'], driver=BlueGigaCCDebugger)
+    dbg = openCCDebugger(
+        opts["port"], enterDebug=opts["enter"], driver=BlueGigaCCDebugger
+    )
 except Exception as e:
     print("ERROR: %s" % str(e))
     sys.exit(1)
@@ -40,9 +48,9 @@ print("           PC : %04x" % dbg.getPC())
 # Get bluegiga-specific info
 binfo = dbg.getBLEInfo()
 print("\nFirmware information:")
-print("      License : %s" % binfo['license'])
-print("   BT Address : %s" % binfo['btaddr'])
-print(" Hardware Ver : %02x" % binfo['hwver'])
+print("      License : %s" % binfo["license"])
+print("   BT Address : %s" % binfo["btaddr"])
+print(" Hardware Ver : %02x" % binfo["hwver"])
 
 print("\nDebug status:")
 renderDebugStatus(dbg.debugStatus)

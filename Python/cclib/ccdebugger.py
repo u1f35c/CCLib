@@ -25,42 +25,48 @@ import sys
 # Chip drivers the CCDebugger will test for
 from cclib.chip.cc254x import CC254X
 from cclib.chip.cc2510 import CC2510
-CHIP_DRIVERS = [ CC254X, CC2510 ]
 
-def openCCDebugger( port, driver=None, enterDebug=False ):
+CHIP_DRIVERS = [CC254X, CC2510]
+
+
+def openCCDebugger(port, driver=None, enterDebug=False):
     """
     Factory function that instantiates the appropriate chip and/or extension
     classes according to the information obtained from the serial port
     """
 
     # Create a proxy class (this raises IOError on errors)
-    proxy = CCLibProxy( port, enterDebug=enterDebug )
+    proxy = CCLibProxy(port, enterDebug=enterDebug)
 
     # Check if no chip is connected
     if proxy.chipID == 0x0000:
         raise IOError("No chip found. Check your connection and/or wiring!")
-    if proxy.chipID == 0xffff:
-        raise IOError("Short-circuit or wrong wiring detected. Check your connection and/or wiring!")
+    if proxy.chipID == 0xFFFF:
+        raise IOError(
+            "Short-circuit or wrong wiring detected. Check your connection and/or wiring!"
+        )
 
     # Locate the appropriate chip driver to instantiate
     if driver is None:
 
         # Test known drivers
         for d in CHIP_DRIVERS:
-            if d.test( proxy.chipID ):
+            if d.test(proxy.chipID):
                 driver = d
                 break
 
         # Raise an exception if no compatible driver was found
         if not driver:
-            raise IOError("No driver found for your chip (chipID=0x%04x)!" % proxy.chipID)
+            raise IOError(
+                "No driver found for your chip (chipID=0x%04x)!" % proxy.chipID
+            )
 
     # Initialize
     inst = driver(proxy=proxy)
     inst.initialize()
 
     # Log message
-    print("INFO: Found a %s chip on %s" % ( inst.chipName(), proxy.port ))
+    print("INFO: Found a %s chip on %s" % (inst.chipName(), proxy.port))
 
     # Get info
     print("\nChip information:")
@@ -68,13 +74,14 @@ def openCCDebugger( port, driver=None, enterDebug=False ):
     print("   Flash size : %i Kb" % (inst.flashSize / 1024))
     print("    Page size : %i Kb" % (inst.flashPageSize / 1024))
     print("    SRAM size : %i Kb" % (inst.sramSize / 1024))
-    if inst.chipInfo['usb']:
+    if inst.chipInfo["usb"]:
         print("          USB : Yes")
     else:
         print("          USB : No")
 
     # Return driver
     return inst
+
 
 def renderDebugConfig(cfg):
     """
@@ -96,6 +103,7 @@ def renderDebugConfig(cfg):
         print(" [X] TIMER_SUSPEND")
     else:
         print(" [ ] TIMER_SUSPEND")
+
 
 def renderDebugStatus(cfg):
     """
@@ -133,4 +141,3 @@ def renderDebugStatus(cfg):
         print(" [X] STACK_OVERFLOW")
     else:
         print(" [ ] STACK_OVERFLOW")
-

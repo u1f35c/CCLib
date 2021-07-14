@@ -17,7 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import print_function
-from cclib import hexdump, renderDebugStatus, renderDebugConfig, getOptions, openCCDebugger
+from cclib import (
+    hexdump,
+    renderDebugStatus,
+    renderDebugConfig,
+    getOptions,
+    openCCDebugger,
+)
 import sys
 
 # Get serial port either form environment or from arguments
@@ -25,7 +31,7 @@ opts = getOptions("Generic CCDebugger Information Tool")
 
 # Open debugger
 try:
-    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
+    dbg = openCCDebugger(opts["port"], enterDebug=opts["enter"])
 except Exception as e:
     print("ERROR: %s" % str(e))
     sys.exit(1)

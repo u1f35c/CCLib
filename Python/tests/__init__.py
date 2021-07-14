@@ -20,6 +20,7 @@ import os
 import atexit
 from tempfile import NamedTemporaryFile
 
+
 def temp_hexfile(contents):
     """
     Windows cannot share a file created with `NamedTemporaryFile`, therefore
@@ -27,8 +28,8 @@ def temp_hexfile(contents):
     featuer only to give us a unique temporary file name that will be deleted
     upon exit
     """
-    hexfile = NamedTemporaryFile(suffix='.hex', delete=False)
-    hexfile.write(contents.encode(encoding='UTF-8'))
+    hexfile = NamedTemporaryFile(suffix=".hex", delete=False)
+    hexfile.write(contents.encode(encoding="UTF-8"))
     hexfile.close()
 
     atexit.register(os.unlink, hexfile.name)

@@ -25,7 +25,7 @@ opts = getOptions("Generic CCDebugger CPU Resume Tool")
 
 # Open debugger
 try:
-    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
+    dbg = openCCDebugger(opts["port"], enterDebug=opts["enter"])
 except Exception as e:
     print("ERROR: %s" % str(e))
     sys.exit(1)

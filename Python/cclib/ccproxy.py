@@ -23,29 +23,30 @@ import serial
 import serial.tools.list_ports
 
 # Command constants
-CMD_ENTER     = 0x01
-CMD_EXIT      = 0x02
-CMD_CHIP_ID   = 0x03
-CMD_STATUS    = 0x04
-CMD_PC        = 0x05
-CMD_STEP      = 0x06
-CMD_EXEC_1    = 0x07
-CMD_EXEC_2    = 0x08
-CMD_EXEC_3    = 0x09
-CMD_BRUSTWR   = 0x0A
-CMD_RD_CFG    = 0x0B
-CMD_WR_CFG    = 0x0C
-CMD_CHPERASE  = 0x0D
-CMD_RESUME    = 0x0E
-CMD_HALT      = 0x0F
-CMD_PING      = 0xF0
+CMD_ENTER = 0x01
+CMD_EXIT = 0x02
+CMD_CHIP_ID = 0x03
+CMD_STATUS = 0x04
+CMD_PC = 0x05
+CMD_STEP = 0x06
+CMD_EXEC_1 = 0x07
+CMD_EXEC_2 = 0x08
+CMD_EXEC_3 = 0x09
+CMD_BRUSTWR = 0x0A
+CMD_RD_CFG = 0x0B
+CMD_WR_CFG = 0x0C
+CMD_CHPERASE = 0x0D
+CMD_RESUME = 0x0E
+CMD_HALT = 0x0F
+CMD_PING = 0xF0
 CMD_INSTR_VER = 0xF1
 CMD_INSTR_UPD = 0xF2
 
 # Response constants
-ANS_OK       = 0x01
-ANS_ERROR    = 0x02
-ANS_READY    = 0x03
+ANS_OK = 0x01
+ANS_ERROR = 0x02
+ANS_READY = 0x03
+
 
 class CCLibProxy:
     """
@@ -76,7 +77,7 @@ class CCLibProxy:
         else:
 
             # If we don't have a port specified perform autodetect
-            if port is None or port == 'auto':
+            if port is None or port == "auto":
                 self.detectPort()
 
             else:
@@ -91,7 +92,9 @@ class CCLibProxy:
                 try:
                     self.ping()
                 except IOError:
-                    raise IOError("Could not find CCLib_proxy device on port %s" % self.ser.name)
+                    raise IOError(
+                        "Could not find CCLib_proxy device on port %s" % self.ser.name
+                    )
 
             # Check if we should enter debug mode
             if enterDebug:
@@ -115,7 +118,7 @@ class CCLibProxy:
         # Prioritize known ports, since on linux and osx scanning
         # weird ports will cost more
         ports = []
-        priority_names =  ['acm', 'usb', 'ttys']
+        priority_names = ["acm", "usb", "ttys"]
         all_ports = list(serial.tools.list_ports.comports())
         for name in priority_names:
             for i in range(0, len(all_ports)):
@@ -172,11 +175,17 @@ class CCLibProxy:
         if status == ANS_ERROR:
             if raiseException:
                 if bL == 0x01:
-                    raise IOError("CCDebugger is not properly initialized. Check your arduino sketch!")
+                    raise IOError(
+                        "CCDebugger is not properly initialized. Check your arduino sketch!"
+                    )
                 elif bL == 0x02:
-                    raise IOError("The chip is not in debug mode! Use the '-E' option (--help for more)")
+                    raise IOError(
+                        "The chip is not in debug mode! Use the '-E' option (--help for more)"
+                    )
                 elif bL == 0x03:
-                    raise IOError("The chip is not responding. Check your connection and/or wiring!")
+                    raise IOError(
+                        "The chip is not responding. Check your connection and/or wiring!"
+                    )
                 else:
                     raise IOError("CCDebugger responded with an error (0x%02x)" % bL)
             else:
@@ -189,18 +198,20 @@ class CCLibProxy:
             if status == ANS_READY:
                 return ANS_READY
             else:
-                raise IOError("CCDebugger responded with an unknown status (0x%02x)" % status)
+                raise IOError(
+                    "CCDebugger responded with an unknown status (0x%02x)" % status
+                )
 
         # Otherwise we are good
         return (bH << 8) | bL
 
-    def sendFrame(self, cmd, c1=0, c2=0, c3=0, raiseException=True ):
+    def sendFrame(self, cmd, c1=0, c2=0, c3=0, raiseException=True):
         """
         Send the specified frame to the output queue
         """
 
         # Send the 4-byte command frame
-        self.ser.write( chr(cmd)+chr(c1)+chr(c2)+chr(c3) )
+        self.ser.write(chr(cmd) + chr(c1) + chr(c2) + chr(c3))
         self.ser.flush()
 
         # Read frame
@@ -299,9 +310,9 @@ class CCLibProxy:
 
         # Call the appropriate instruction according
         # to the number of bytes
-        if (c2 == None):
+        if c2 == None:
             return self.sendFrame(CMD_EXEC_1, c1)
-        elif (c3 == None):
+        elif c3 == None:
             return self.sendFrame(CMD_EXEC_2, c1, c2)
         else:
             return self.sendFrame(CMD_EXEC_3, c1, c2, c3)
@@ -313,7 +324,7 @@ class CCLibProxy:
 
         # Split short in high/low order bytes
         cHigh = (i1 >> 8) & 0xFF
-        cLow = (i1 & 0xFF)
+        cLow = i1 & 0xFF
 
         # Send instruction
         return self.sendFrame(CMD_EXEC_3, c1, cHigh, cLow)
@@ -331,12 +342,14 @@ class CCLibProxy:
 
         # Split length in high/low order bytes
         cHigh = (length >> 8) & 0xFF
-        cLow = (length & 0xFF)
+        cLow = length & 0xFF
 
         # Prepare for BRUST frame transmission
         ans = self.sendFrame(CMD_BRUSTWR, cHigh, cLow)
         if ans != ANS_READY:
-            raise IOError("Unable to prepare for brust-write! (Unknown response 0x%02x)" % ans)
+            raise IOError(
+                "Unable to prepare for brust-write! (Unknown response 0x%02x)" % ans
+            )
 
         # Start sending data
         self.ser.write(data)
@@ -359,7 +372,7 @@ class CCLibProxy:
 
         # Wait until CHIP_ERASE_BUSY goes down
         s = self.getStatus()
-        while (( s & 0x80 ) != 0):
+        while (s & 0x80) != 0:
             time.sleep(0.01)
             s = self.getStatus()
 
@@ -380,7 +393,9 @@ class CCLibProxy:
 
         # Check limits
         if len(instr) > 15:
-            raise IOError("Invalid size of the instruction table! It must be smaller than 16")
+            raise IOError(
+                "Invalid size of the instruction table! It must be smaller than 16"
+            )
 
         # Insert version
         table = [version] + list(instr)
@@ -392,7 +407,10 @@ class CCLibProxy:
         # Express our interest to update the instruction table
         ans = self.sendFrame(CMD_INSTR_UPD)
         if ans != ANS_READY:
-            raise IOError("Unable to prepare for instruction table update! (Unknown response 0x%02x)" % ans)
+            raise IOError(
+                "Unable to prepare for instruction table update! (Unknown response 0x%02x)"
+                % ans
+            )
 
         # Start sending data
         for b in table:
@@ -402,7 +420,10 @@ class CCLibProxy:
         # Get confirmation
         newVersion = self.readFrame()
         if newVersion != version:
-            raise IOError("Unable to update the instruction table! (Unknown response 0x%02x)" % ans)
+            raise IOError(
+                "Unable to update the instruction table! (Unknown response 0x%02x)"
+                % ans
+            )
 
         # Return new version
         self.instructionTableVersion = newVersion

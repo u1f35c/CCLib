@@ -21,35 +21,39 @@ from cclib import CCHEXFile, getOptions, openCCDebugger
 import sys
 
 # Get serial port either form environment or from arguments
-opts = getOptions("Generic CCDebugger Flash Writer Tool", hexIn=True,
-    erase="Full chip erase before write", offset=":Offset the addresses in the .hex file by this value")
+opts = getOptions(
+    "Generic CCDebugger Flash Writer Tool",
+    hexIn=True,
+    erase="Full chip erase before write",
+    offset=":Offset the addresses in the .hex file by this value",
+)
 
 # Open debugger
 try:
-    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
+    dbg = openCCDebugger(opts["port"], enterDebug=opts["enter"])
 except Exception as e:
     print("ERROR: %s" % str(e))
     sys.exit(1)
 
 # Get offset
 offset = 0
-if opts['offset']:
-    if opts['offset'][0:2] == "0x":
-        offset = int(opts['offset'], 16)
+if opts["offset"]:
+    if opts["offset"][0:2] == "0x":
+        offset = int(opts["offset"], 16)
     else:
-        offset = int(opts['offset'])
+        offset = int(opts["offset"])
     print("NOTE: The memory addresses are offset by %i bytes!" % offset)
 
 # Get bluegiga-specific info
 serial = dbg.getSerial()
 
 # Parse the HEX file
-hexFile = CCHEXFile( opts['in'] )
+hexFile = CCHEXFile(opts["in"])
 hexFile.load()
 
 # Display sections & calculate max memory usage
 maxMem = 0
-print("Sections in %s:\n" % opts['in'])
+print("Sections in %s:\n" % opts["in"])
 print(" Addr.    Size")
 print("-------- -------------")
 for mb in hexFile.memBlocks:
@@ -64,15 +68,15 @@ for mb in hexFile.memBlocks:
 print("")
 
 # Check for oversize data
-if maxMem > (dbg.chipInfo['flash'] * 1024):
+if maxMem > (dbg.chipInfo["flash"] * 1024):
     print("ERROR: Data too bit to fit in chip's memory!")
     sys.exit(4)
 
 # Confirm
 erasePrompt = "OVERWRITE"
-if opts['erase']:
+if opts["erase"]:
     erasePrompt = "ERASE and REPROGRAM"
-print("This is going to %s the chip. Are you sure? <y/N>: " % erasePrompt, end=' ')
+print("This is going to %s the chip. Are you sure? <y/N>: " % erasePrompt, end=" ")
 ans = sys.stdin.readline()[0:-1]
 if (ans != "y") and (ans != "Y"):
     print("Aborted")
@@ -83,7 +87,7 @@ if (ans != "y") and (ans != "Y"):
 print("\nFlashing:")
 
 # Send chip erase
-if opts['erase']:
+if opts["erase"]:
     print(" - Chip erase...")
     try:
         dbg.chipErase()
@@ -99,7 +103,7 @@ for mb in hexFile.memBlocks:
     # Flash memory block
     print(" -> 0x%04x : %i bytes " % (mb.addr + offset, mb.size))
     try:
-        dbg.writeCODE( mb.addr + offset, mb.bytes, verify=True, showProgress=True )
+        dbg.writeCODE(mb.addr + offset, mb.bytes, verify=True, showProgress=True)
     except Exception as e:
         print("ERROR: %s" % str(e))
         sys.exit(3)

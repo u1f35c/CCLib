@@ -20,6 +20,7 @@
 from cclib.ccdebugger import *
 from cclib.cchex import *
 
+
 def getOptions(shortDesc, argHelp="", hexIn=False, hexOut=False, port=True, **kwargs):
     """
     Reusable function to collect command-line options.
@@ -28,56 +29,58 @@ def getOptions(shortDesc, argHelp="", hexIn=False, hexOut=False, port=True, **kw
     import sys
     import os
 
-    values = { 'enter': False, 'port': None }
+    values = {"enter": False, "port": None}
     required = []
     arguments = []
-    arguments.append( ('h', 'help', 'Display this help screen' ) )
-    arguments.append( ('E', 'enter', 'Enter debug mode if not debugging already' ) )
+    arguments.append(("h", "help", "Display this help screen"))
+    arguments.append(("E", "enter", "Enter debug mode if not debugging already"))
     arg_help = "[-h|--help] [-E|--enter]"
 
     # Append some other options
     if hexIn:
-        values['in'] = None
+        values["in"] = None
         arg_help += " [-i|--in=<hex file>]"
-        arguments.append( ('i:', 'in=', 'Specify the hex file to read from' ) )
-        required.append('in')
+        arguments.append(("i:", "in=", "Specify the hex file to read from"))
+        required.append("in")
     if hexOut:
-        values['out'] = None
+        values["out"] = None
         arg_help += " [-o|--out=<hex file>]"
-        arguments.append( ('o:', 'out=', 'Specify the hex file to write to' ) )
-        required.append('out')
+        arguments.append(("o:", "out=", "Specify the hex file to write to"))
+        required.append("out")
     if port:
-        values['port'] = os.environ.get("CC_SERIAL", None)
+        values["port"] = os.environ.get("CC_SERIAL", None)
         arg_help += " [-p|--port=<serial>]"
-        arguments.append( ('p:', 'port=', 'Specify the serial port to use (autodetect if missing)' ) )
+        arguments.append(
+            ("p:", "port=", "Specify the serial port to use (autodetect if missing)")
+        )
 
     # New line
     if len(kwargs) > 0:
         arg_help += "\n" + (" " * (7 + len(sys.argv[0])))
 
     # Append custom keyword arguments
-    for k,v in kwargs.items():
-        if (v[0] == ":"):
+    for k, v in kwargs.items():
+        if v[0] == ":":
             values[k] = None
             arg_help += " [-%s|--%s=]" % (k[0], k)
-            arguments.append( (k[0]+':', k+'=', v[1:]) )
+            arguments.append((k[0] + ":", k + "=", v[1:]))
         else:
             values[k] = False
             arg_help += " [-%s|--%s]" % (k[0], k)
-            arguments.append( (k[0], k, v) )
+            arguments.append((k[0], k, v))
 
     # Parse options
     try:
         opts, args = getopt.getopt(
-            sys.argv[1:], "".join([v[0] for v in arguments]),
-            [v[1] for v in arguments] )
+            sys.argv[1:], "".join([v[0] for v in arguments]), [v[1] for v in arguments]
+        )
     except getopt.GetoptError as err:
         print("ERROR: %s" % str(err))
         print(shortDesc)
         print("Usage: %s %s %s" % (sys.argv[0], arg_help, argHelp))
         print("")
         for a in arguments:
-            if a[0][-1] == ':':
+            if a[0][-1] == ":":
                 args = "-%s,--%s=" % (a[0][:-1], a[1][:-1])
                 print(" %20s %s" % (args, a[2]))
             else:
@@ -93,7 +96,7 @@ def getOptions(shortDesc, argHelp="", hexIn=False, hexOut=False, port=True, **kw
             print("Usage: %s %s %s" % (sys.argv[0], arg_help, argHelp))
             print("")
             for a in arguments:
-                if a[0][-1] == ':':
+                if a[0][-1] == ":":
                     args = "-%s,--%s=" % (a[0][:-1], a[1][:-1])
                     print(" %20s %s" % (args, a[2]))
                 else:
@@ -105,13 +108,13 @@ def getOptions(shortDesc, argHelp="", hexIn=False, hexOut=False, port=True, **kw
             # Process arguments
             found = False
             for a in arguments:
-                if a[0][-1] == ':':
-                    test = ('-%s' % a[0][:-1], '--%s' % a[1][:-1])
+                if a[0][-1] == ":":
+                    test = ("-%s" % a[0][:-1], "--%s" % a[1][:-1])
                     if o in test:
                         values[a[1][:-1]] = v
                         found = True
                 else:
-                    test = ('-%s' % a[0], '--%s' % a[1])
+                    test = ("-%s" % a[0], "--%s" % a[1])
                     if o in test:
                         values[a[1]] = True
                         found = True
@@ -125,10 +128,12 @@ def getOptions(shortDesc, argHelp="", hexIn=False, hexOut=False, port=True, **kw
     for k in required:
         if not values[k]:
             print(shortDesc)
-            print("ERROR: Missing argument '-%s', try %s --help for more details" % (k, sys.argv[0]))
+            print(
+                "ERROR: Missing argument '-%s', try %s --help for more details"
+                % (k, sys.argv[0])
+            )
             sys.exit(1)
 
     # Include raw args
-    values['args'] = args
+    values["args"] = args
     return values
-

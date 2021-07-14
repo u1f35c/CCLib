@@ -17,17 +17,20 @@
 #
 from __future__ import print_function
 
+
 def toHex(data):
     """
     Utility function to convert a buffer to hexadecimal
     """
-    return "".join( "%02x" % x for x in data )
+    return "".join("%02x" % x for x in data)
 
-def fromHex(data,offset=0,step=2):
+
+def fromHex(data, offset=0, step=2):
     """
     Utility function to convert a hexadecimal string to buffer
     """
-    return bytearray([ int(data[x:x+2],16) for x in range(offset,len(data),step) ])
+    return bytearray([int(data[x : x + 2], 16) for x in range(offset, len(data), step)])
+
 
 def hexdump(src, length=8):
     """
@@ -36,11 +39,12 @@ def hexdump(src, length=8):
     result = []
     digits = 4 if isinstance(src, str) else 2
     for i in range(0, len(src), length):
-        s = src[i:i+length]
-        hexa = b' '.join(["%0*X" % (digits, x)  for x in s])
-        text = b''.join([chr(x) if 0x20 <= x < 0x7F else b'.'  for x in s])
-        result.append( b"%04X   %-*s   %s" % (i, length*(digits + 1), hexa, text) )
-    return b'\n'.join(result)
+        s = src[i : i + length]
+        hexa = b" ".join(["%0*X" % (digits, x) for x in s])
+        text = b"".join([chr(x) if 0x20 <= x < 0x7F else b"." for x in s])
+        result.append(b"%04X   %-*s   %s" % (i, length * (digits + 1), hexa, text))
+    return b"\n".join(result)
+
 
 class CCMemBlock:
     """
@@ -62,7 +66,7 @@ class CCMemBlock:
         """
 
         # Check bundaries
-        return (addr >= self.addr) and ((addr+size) <= (self.addr+self.size))
+        return (addr >= self.addr) and ((addr + size) <= (self.addr + self.size))
 
     def isContinuous(self, addr):
         """
@@ -73,16 +77,16 @@ class CCMemBlock:
             self.size = 0
             return True
         else:
-            return ((self.addr + self.size) == addr)
+            return (self.addr + self.size) == addr
 
     def set(self, offset, bytes):
         """
         Update bock bytes
         """
-        #print "Replacing @ %04x (%i):" % (offset, len(bytes))
-        #print "<-", "".join(["%02x" % x for x in self.bytes[offset:offset+len(bytes)]])
-        self.bytes[offset:offset+len(bytes)] = bytes
-        #print "->", "".join(["%02x" % x for x in self.bytes[offset:offset+len(bytes)]])
+        # print "Replacing @ %04x (%i):" % (offset, len(bytes))
+        # print "<-", "".join(["%02x" % x for x in self.bytes[offset:offset+len(bytes)]])
+        self.bytes[offset : offset + len(bytes)] = bytes
+        # print "->", "".join(["%02x" % x for x in self.bytes[offset:offset+len(bytes)]])
 
     def stack(self, bytes):
         """
@@ -93,6 +97,7 @@ class CCMemBlock:
 
     def __repr__(self):
         return "<MemBlock @ 0x%04x (%i Bytes)>" % (self.addr, self.size)
+
 
 class CCHEXFile:
     """
@@ -106,7 +111,7 @@ class CCHEXFile:
         self.filename = filename
         self.memBlocks = []
 
-    def load(self,filename=None, ftype=None):
+    def load(self, filename=None, ftype=None):
         """
         Load file
         """
@@ -131,7 +136,7 @@ class CCHEXFile:
         else:
             raise IOError("Unknown format '%s' specified!" % ftype)
 
-    def save(self,filename=None, ftype=None):
+    def save(self, filename=None, ftype=None):
         """
         Load file
         """
@@ -244,11 +249,11 @@ class CCHEXFile:
                 # Build field bytes
                 dlen = len(bytes)
                 header = [
-                        dlen,               #  0: Data field lenght
-                        (addr >> 8) & 0xFF, #  1: Address High
-                        addr & 0xFF,        #  2: Address Low
-                        cmd                 #  3: Field type
-                        ]
+                    dlen,  #  0: Data field lenght
+                    (addr >> 8) & 0xFF,  #  1: Address High
+                    addr & 0xFF,  #  2: Address Low
+                    cmd,  #  3: Field type
+                ]
 
                 # Extend bytes
                 bytes = bytearray(header) + bytearray(bytes)
@@ -257,7 +262,7 @@ class CCHEXFile:
                 csum = self._checksum(bytes)
 
                 # Write to file
-                f.write((":%s%02x\n" % (toHex(bytes), csum)).encode(encoding='UTF-8'))
+                f.write((":%s%02x\n" % (toHex(bytes), csum)).encode(encoding="UTF-8"))
 
             # Handle memory blocks
             hexBlockOfs = 0
@@ -265,7 +270,7 @@ class CCHEXFile:
 
                 # Specify offset address
                 addr = (mb.addr >> 16) & 0xFFFF
-                _write(0x0000, 0x04, [(addr >> 8) & 0xFF, addr & 0xFF ])
+                _write(0x0000, 0x04, [(addr >> 8) & 0xFF, addr & 0xFF])
 
                 # Start reading 0x10-sized blocks
                 iOfs = 0
@@ -273,25 +278,24 @@ class CCHEXFile:
                 while iOfs < mb.size:
 
                     # Clip length when we are about to overflow
-                    if iOfs+iLen > mb.size:
+                    if iOfs + iLen > mb.size:
                         iLen = mb.size - iOfs
 
                     # If we are overflowing the 2-byte buffer of the hext
                     # file, inser a new offset address
-                    if (iOfs-hexBlockOfs > 0xFFFF):
+                    if iOfs - hexBlockOfs > 0xFFFF:
                         hexBlockOfs += 0x10000
                         addr = ((mb.addr + hexBlockOfs) >> 16) & 0xFF
-                        _write(0x0000, 0x04, [(addr >> 8) & 0xFF, addr & 0xFF ])
+                        _write(0x0000, 0x04, [(addr >> 8) & 0xFF, addr & 0xFF])
 
                     # Write data
-                    _write(iOfs-hexBlockOfs, 0x00, mb.bytes[iOfs:iOfs+iLen])
+                    _write(iOfs - hexBlockOfs, 0x00, mb.bytes[iOfs : iOfs + iLen])
 
                     # Move forward
                     iOfs += iLen
 
             # Write end-of-file
             _write(0x00, 0x01, [])
-
 
     def _loadHex(self):
         """
@@ -321,7 +325,7 @@ class CCHEXFile:
                     raise IOError("Line %i: Source file is not in HEX format!" % i)
 
                 # Convert input line to bytes
-                bytes = [ int(line[x:x+2],16) for x in range(1,len(line),2) ]
+                bytes = [int(line[x : x + 2], 16) for x in range(1, len(line), 2)]
                 csum = bytes.pop()
 
                 # Validate checksum
@@ -360,7 +364,7 @@ class CCHEXFile:
                         mb = CCMemBlock(bAddr)
                         mb.stack(bytearray(bytes))
 
-                    #print "0x%06x : " % bAddr, "".join( "%02x " % x for x in bytes )
+                    # print "0x%06x : " % bAddr, "".join( "%02x " % x for x in bytes )
 
                 # Everything else raise error
                 else:

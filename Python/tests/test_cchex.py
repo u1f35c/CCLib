@@ -21,6 +21,7 @@ from unittest import TestCase
 from binascii import unhexlify
 from tests import temp_hexfile
 
+
 class TestCCHEXFile(TestCase):
     def test_load_creates_correct_single_memblock(self):
         offset = "0100"
@@ -34,13 +35,10 @@ class TestCCHEXFile(TestCase):
         assert len(cchex.memBlocks) == 1
         memBlock = cchex.memBlocks[0]
         assert memBlock.addr == int(offset, 16)
-        assert memBlock.bytes == unhexlify(data.encode(encoding='UTF-8'))
+        assert memBlock.bytes == unhexlify(data.encode(encoding="UTF-8"))
 
     def test_load_creates_correct_noncontinuous_memblocks(self):
-        lines = [
-            ":10010000" + "7F" * 16 + "FF\n",
-            ":10050000" + "3D" * 16 + "1B\n",
-        ]
+        lines = [":10010000" + "7F" * 16 + "FF\n", ":10050000" + "3D" * 16 + "1B\n"]
 
         hexfile = temp_hexfile("".join(lines))
         cchex = CCHEXFile()

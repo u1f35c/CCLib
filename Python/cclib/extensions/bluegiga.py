@@ -19,6 +19,7 @@
 # BLE112/BLE113 use a CC2540 chip
 from cclib.chip.cc254x import CC254X
 
+
 class BlueGigaCCDebugger(CC254X):
     """
     BlueGiga-Specific extensions to the CCDebugger
@@ -39,7 +40,7 @@ class BlueGigaCCDebugger(CC254X):
 
         # Copy upper 64 bytes
         l = len(target)
-        target[l-0x40:l] = source[l-0x40:l]
+        target[l - 0x40 : l] = source[l - 0x40 : l]
 
         # Return target
         return target
@@ -59,7 +60,7 @@ class BlueGigaCCDebugger(CC254X):
 
         # Update lincense region
         l = len(target)
-        target[l-57:l-25] = license
+        target[l - 57 : l - 25] = license
 
         # Return target
         return target
@@ -71,7 +72,7 @@ class BlueGigaCCDebugger(CC254X):
 
         # Check if we have to convert the bluetooth address bytes
         if fromHEX:
-            btAddress = fromHex(btAddress,step=3)
+            btAddress = fromHex(btAddress, step=3)
 
         # Validate lincense size
         if len(btAddress) != 6:
@@ -79,7 +80,7 @@ class BlueGigaCCDebugger(CC254X):
 
         # Update lincense region
         l = len(target)
-        target[l-22:l-16] = btAddress
+        target[l - 22 : l - 16] = btAddress
 
         # Return target
         return target
@@ -90,18 +91,18 @@ class BlueGigaCCDebugger(CC254X):
         """
 
         # Get page data
-        page = self.readCODE( self.flashSize-0x40, 0x40 )
+        page = self.readCODE(self.flashSize - 0x40, 0x40)
 
         # Convert bytes to hex representation
-        strLic = "".join( "%02x" % x for x in page[7:39] )
-        strBTAddr = "".join( "%02x:" % x for x in page[42:48] )[0:-1]
+        strLic = "".join("%02x" % x for x in page[7:39])
+        strBTAddr = "".join("%02x:" % x for x in page[42:48])[0:-1]
 
         # Return translated information
         return {
-            "license" : strLic,
-            "hwver"   : page[39],
-            "btaddr"  : strBTAddr,
-            "lockbits": page[48:64]
+            "license": strLic,
+            "hwver": page[39],
+            "btaddr": strBTAddr,
+            "lockbits": page[48:64],
         }
 
     def getBLEPStoreSize(self):
@@ -130,4 +131,3 @@ class BlueGigaCCDebugger(CC254X):
         Update the permanent store
         """
         pass
-
