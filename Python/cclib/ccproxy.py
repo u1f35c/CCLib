@@ -211,7 +211,7 @@ class CCLibProxy:
         """
 
         # Send the 4-byte command frame
-        self.ser.write(chr(cmd) + chr(c1) + chr(c2) + chr(c3))
+        self.ser.write(bytearray([cmd, c1, c2, c3]))
         self.ser.flush()
 
         # Read frame
