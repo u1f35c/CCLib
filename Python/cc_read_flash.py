@@ -25,10 +25,10 @@ opts = getOptions("Generic CCDebugger Flash Reader Tool", hexOut=True)
 
 # Open debugger
 try:
-	dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
+    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
 except Exception as e:
-	print("ERROR: %s" % str(e))
-	sys.exit(1)
+    print("ERROR: %s" % str(e))
+    sys.exit(1)
 
 # Get serial number
 print("\nReading %i KBytes to %s..." % (dbg.chipInfo['flash'], opts['out']))
@@ -37,15 +37,15 @@ hexFile = CCHEXFile(opts['out'])
 # Read in chunks of 4Kb (for UI-update purposes)
 for i in range(0, int(dbg.chipInfo['flash'] / 4)):
 
-	# Read CODE
-	chunk = dbg.readCODE( i * 0x1000, 0x1000 )
+    # Read CODE
+    chunk = dbg.readCODE( i * 0x1000, 0x1000 )
 
-	# Write chunk to file
-	hexFile.stack(chunk)
+    # Write chunk to file
+    hexFile.stack(chunk)
 
-	# Log status
-	print("\r    Progress %.0f%%..." % ( ( (i+1)*4 * 100) / dbg.chipInfo['flash'] ), end=' ')
-	sys.stdout.flush()
+    # Log status
+    print("\r    Progress %.0f%%..." % ( ( (i+1)*4 * 100) / dbg.chipInfo['flash'] ), end=' ')
+    sys.stdout.flush()
 
 # Log completion
 print("\r    Progress 100%... OK")

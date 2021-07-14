@@ -27,10 +27,10 @@ opts = getOptions("BlueGiga-Specific CCDebugger Information Tool")
 
 # Open debugger
 try:
-	dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'], driver=BlueGigaCCDebugger)
+    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'], driver=BlueGigaCCDebugger)
 except Exception as e:
-	print("ERROR: %s" % str(e))
-	sys.exit(1)
+    print("ERROR: %s" % str(e))
+    sys.exit(1)
 
 # Get device information from the read-only section
 print("\nDevice information:")

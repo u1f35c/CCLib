@@ -25,23 +25,23 @@ opts = getOptions("Generic CCDebugger CPU Resume Tool")
 
 # Open debugger
 try:
-	dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
+    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
 except Exception as e:
-	print("ERROR: %s" % str(e))
-	sys.exit(1)
+    print("ERROR: %s" % str(e))
+    sys.exit(1)
 
 # Check if we are already outside the debug mode
 if (dbg.debugStatus & 0x20) == 0:
-	print("CPU Already running")
-	sys.exit(0)
+    print("CPU Already running")
+    sys.exit(0)
 
 # Exit debug mode & resume CPU
 print("Exiting DEBUG mode...")
 dbg.exit()
 if (dbg.debugStatus & 0x20) == 0:
-	print("CPU is now running")
+    print("CPU is now running")
 else:
-	print("ERROR: Could not exit from debug mode")
+    print("ERROR: Could not exit from debug mode")
 
 # Done
 print("")

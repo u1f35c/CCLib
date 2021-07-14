@@ -25,10 +25,10 @@ opts = getOptions("Generic CCDebugger Information Tool")
 
 # Open debugger
 try:
-	dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
+    dbg = openCCDebugger(opts['port'], enterDebug=opts['enter'])
 except Exception as e:
-	print("ERROR: %s" % str(e))
-	sys.exit(1)
+    print("ERROR: %s" % str(e))
+    sys.exit(1)
 
 # Get device information from the read-only section
 print("\nDevice information:")

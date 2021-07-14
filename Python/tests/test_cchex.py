@@ -22,39 +22,39 @@ from binascii import unhexlify
 from tests import temp_hexfile
 
 class TestCCHEXFile(TestCase):
-  def test_load_creates_correct_single_memblock(self):
-    offset = "0100"
-    data = "214601360121470136007EFE09D21901"
-    checksum = "40"
+    def test_load_creates_correct_single_memblock(self):
+        offset = "0100"
+        data = "214601360121470136007EFE09D21901"
+        checksum = "40"
 
-    hexfile = temp_hexfile(":10" + offset + "00" + data + checksum + "\n")
-    cchex = CCHEXFile()
-    cchex.load(hexfile)
+        hexfile = temp_hexfile(":10" + offset + "00" + data + checksum + "\n")
+        cchex = CCHEXFile()
+        cchex.load(hexfile)
 
-    assert len(cchex.memBlocks) == 1
-    memBlock = cchex.memBlocks[0]
-    assert memBlock.addr == int(offset, 16)
-    assert memBlock.bytes == unhexlify(data.encode(encoding='UTF-8'))
+        assert len(cchex.memBlocks) == 1
+        memBlock = cchex.memBlocks[0]
+        assert memBlock.addr == int(offset, 16)
+        assert memBlock.bytes == unhexlify(data.encode(encoding='UTF-8'))
 
-  def test_load_creates_correct_noncontinuous_memblocks(self):
-    lines = [
-      ":10010000" + "7F" * 16 + "FF\n",
-      ":10050000" + "3D" * 16 + "1B\n",
-    ]
+    def test_load_creates_correct_noncontinuous_memblocks(self):
+        lines = [
+            ":10010000" + "7F" * 16 + "FF\n",
+            ":10050000" + "3D" * 16 + "1B\n",
+        ]
 
-    hexfile = temp_hexfile("".join(lines))
-    cchex = CCHEXFile()
-    cchex.load(hexfile)
+        hexfile = temp_hexfile("".join(lines))
+        cchex = CCHEXFile()
+        cchex.load(hexfile)
 
-    assert len(cchex.memBlocks) == 2
-    assert cchex.memBlocks[0].addr == 0x0100
-    assert cchex.memBlocks[0].bytes == b"\x7F" * 16
-    assert cchex.memBlocks[1].addr == 0x0500
-    assert cchex.memBlocks[1].bytes == b"\x3D" * 16
+        assert len(cchex.memBlocks) == 2
+        assert cchex.memBlocks[0].addr == 0x0100
+        assert cchex.memBlocks[0].bytes == b"\x7F" * 16
+        assert cchex.memBlocks[1].addr == 0x0500
+        assert cchex.memBlocks[1].bytes == b"\x3D" * 16
 
-  def test_load_works_with_dos_style_line_endings(self):
-    hexfile = temp_hexfile(":0B0010006164647265737320676170A7\r\n")
-    cchex = CCHEXFile()
-    cchex.load(hexfile)
+    def test_load_works_with_dos_style_line_endings(self):
+        hexfile = temp_hexfile(":0B0010006164647265737320676170A7\r\n")
+        cchex = CCHEXFile()
+        cchex.load(hexfile)
 
-    assert len(cchex.memBlocks) == 1
+        assert len(cchex.memBlocks) == 1

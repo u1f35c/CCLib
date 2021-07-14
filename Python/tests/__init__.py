@@ -21,16 +21,16 @@ import atexit
 from tempfile import NamedTemporaryFile
 
 def temp_hexfile(contents):
-  """
-  Windows cannot share a file created with `NamedTemporaryFile`, therefore
-  we are choosing the less secure, yet more portable way of using that
-  featuer only to give us a unique temporary file name that will be deleted
-  upon exit
-  """
-  hexfile = NamedTemporaryFile(suffix='.hex', delete=False)
-  hexfile.write(contents.encode(encoding='UTF-8'))
-  hexfile.close()
+    """
+    Windows cannot share a file created with `NamedTemporaryFile`, therefore
+    we are choosing the less secure, yet more portable way of using that
+    featuer only to give us a unique temporary file name that will be deleted
+    upon exit
+    """
+    hexfile = NamedTemporaryFile(suffix='.hex', delete=False)
+    hexfile.write(contents.encode(encoding='UTF-8'))
+    hexfile.close()
 
-  atexit.register(os.unlink, hexfile.name)
+    atexit.register(os.unlink, hexfile.name)
 
-  return hexfile.name
+    return hexfile.name
