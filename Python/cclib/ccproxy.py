@@ -414,7 +414,7 @@ class CCLibProxy:
 
         # Start sending data
         for b in table:
-            self.ser.write(chr(b & 0xFF))
+            self.ser.write(bytearray([b & 0xFF]))
         self.ser.flush()
 
         # Get confirmation
