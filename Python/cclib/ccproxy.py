@@ -421,8 +421,8 @@ class CCLibProxy:
         newVersion = self.readFrame()
         if newVersion != version:
             raise IOError(
-                "Unable to update the instruction table! (Unknown response 0x%02x)"
-                % ans
+                "Unable to update the instruction table! (Unexpected table version 0x%02x)"
+                % newVersion
             )
 
         # Return new version
