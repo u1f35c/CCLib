@@ -32,7 +32,7 @@ CMD_STEP = 0x06
 CMD_EXEC_1 = 0x07
 CMD_EXEC_2 = 0x08
 CMD_EXEC_3 = 0x09
-CMD_BRUSTWR = 0x0A
+CMD_BURSTWR = 0x0A
 CMD_RD_CFG = 0x0B
 CMD_WR_CFG = 0x0C
 CMD_CHPERASE = 0x0D
@@ -329,9 +329,9 @@ class CCLibProxy:
         # Send instruction
         return self.sendFrame(CMD_EXEC_3, c1, cHigh, cLow)
 
-    def brustWrite(self, data):
+    def burstWrite(self, data):
         """
-        Perform a brust-write operation which allows us to write
+        Perform a burst-write operation which allows us to write
         up to 2Kb in the DBGDATA register.
         """
 
@@ -344,11 +344,11 @@ class CCLibProxy:
         cHigh = (length >> 8) & 0xFF
         cLow = length & 0xFF
 
-        # Prepare for BRUST frame transmission
-        ans = self.sendFrame(CMD_BRUSTWR, cHigh, cLow)
+        # Prepare for BURST frame transmission
+        ans = self.sendFrame(CMD_BURSTWR, cHigh, cLow)
         if ans != ANS_READY:
             raise IOError(
-                "Unable to prepare for brust-write! (Unknown response 0x%02x)" % ans
+                "Unable to prepare for burst-write! (Unknown response 0x%02x)" % ans
             )
 
         # Start sending data

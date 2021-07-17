@@ -225,7 +225,7 @@ Since most of the debug commands are at max 4-bytes long, we are sending from th
 
 The only exceptions are:
 
-  * The brust-write command (CMD_BRUSTWR), where up to 2048 bytes might follow the 4-byte frame, and
+  * The burst-write command (CMD_BURSTWR), where up to 2048 bytes might follow the 4-byte frame, and
   * The instrunctionset update command (CMD_INSTR_UPD), were 16 bytes must follow the 4-byte frame.
 
 The Teensy/Arduino will always reply with the following 3-byte long frame:

@@ -606,7 +606,7 @@ class CC254X(ChipDriver):
 
             # Upload to RAM through DMA-0
             self.armDMAChannel(0)
-            self.brustWrite(data[iOfs : iOfs + iLen])
+            self.burstWrite(data[iOfs : iOfs + iLen])
 
             # Wait until DMA-0 raises interrupt
             while not self.isDMAIRQ(0):

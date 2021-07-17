@@ -59,7 +59,7 @@ int LED      = LED_BUILTIN;
 #define   CMD_EXEC_1    byte(0x07)
 #define   CMD_EXEC_2    byte(0x08)
 #define   CMD_EXEC_3    byte(0x09)
-#define   CMD_BRUSTWR   byte(0x0A)
+#define   CMD_BURSTWR   byte(0x0A)
 #define   CMD_RD_CFG    byte(0x0B)
 #define   CMD_WR_CFG    byte(0x0C)
 #define   CMD_CHPERASE  byte(0x0D)
@@ -195,9 +195,9 @@ void loop() {
     if (handleError()) return;
     sendFrame( ANS_OK, bAns );
   
-  } else if (inByte == CMD_BRUSTWR) {
+  } else if (inByte == CMD_BURSTWR) {
     
-    // Calculate the size of the incoming brust
+    // Calculate the size of the incoming burst
     iLen = (c1 << 8) | c2;
     
     // Validate length
@@ -209,7 +209,7 @@ void loop() {
     // Confirm transfer
     sendFrame( ANS_READY );
     
-    // Prepare for brust-write
+    // Prepare for burst-write
     dbg->write( 0x80 | (c1 & 0x07) ); // High-order bits
     dbg->write( c2 ); // Low-order bits
     
