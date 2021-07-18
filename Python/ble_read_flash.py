@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # CCLib_proxy Utilities - BlueGiga Specific
 # Copyright (c) 2014 Ioannis Charalampidis

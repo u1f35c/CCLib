@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # CCLib_proxy Utilities
 # Copyright (c) 2014 Ioannis Charalampidis
@@ -77,6 +77,7 @@ erasePrompt = "OVERWRITE"
 if opts["erase"]:
     erasePrompt = "ERASE and REPROGRAM"
 print("This is going to %s the chip. Are you sure? <y/N>: " % erasePrompt, end=" ")
+sys.stdout.flush()
 ans = sys.stdin.readline()[0:-1]
 if (ans != "y") and (ans != "Y"):
     print("Aborted")
