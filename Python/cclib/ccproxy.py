@@ -370,10 +370,25 @@ class CCLibProxy:
         """
 
         bufferSize = 2048
-        # Validate length
-        if length > bufferSize:
-            raise IOError(f"Invalid size of burst read: {length}, max {bufferSize}")
+        data = bytearray()
 
+        # If we need more than 2048 do the read in chunks
+        while self.burstReadOK and length > bufferSize:
+            # Read a full 2048 bytes (8 * 256 + 0)
+            ans = self.sendFrame(CMD_BURSTRD, 8, 0, raiseException=False)
+
+            if ans == -255:
+                self.burstReadOK = False
+            elif ans != ANS_READY:
+                raise IOError(
+                    "Unable to prepare for burst-read! (Unknown response 0x%02x)" % ans
+                )
+            else:
+                data += self.ser.read(bufferSize)
+                length -= bufferSize
+                self.readFrame(raiseException=True)
+
+        # Get the last < 2048 chunk
         if self.burstReadOK:
             # Split length in high/low order bytes
             cHigh = (length >> 8) & 0xFF
@@ -389,10 +404,8 @@ class CCLibProxy:
                     "Unable to prepare for burst-read! (Unknown response 0x%02x)" % ans
                 )
 
-        data = bytearray()
-
         if self.burstReadOK:
-            data = self.ser.read(length)
+            data += self.ser.read(length)
 
             self.readFrame(raiseException=True)
         else:
