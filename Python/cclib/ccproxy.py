@@ -74,6 +74,7 @@ class CCLibProxy:
             self.debugStatus = parent.debugStatus
             self.debugConfig = parent.debugConfig
             self.instructionTableVersion = parent.instructionTableVersion
+            self.burstReadOK = parent.burstReadOK
 
         else:
 
@@ -96,6 +97,9 @@ class CCLibProxy:
                     raise IOError(
                         "Could not find CCLib_proxy device on port %s" % self.ser.name
                     )
+
+            # Assume we support burst reads
+            self.burstReadOK = True
 
             # Check if we should enter debug mode
             if enterDebug:
@@ -370,23 +374,35 @@ class CCLibProxy:
         if length > bufferSize:
             raise IOError(f"Invalid size of burst read: {length}, max {bufferSize}")
 
-        # Split length in high/low order bytes
-        cHigh = (length >> 8) & 0xFF
-        cLow = length & 0xFF
+        if self.burstReadOK:
+            # Split length in high/low order bytes
+            cHigh = (length >> 8) & 0xFF
+            cLow = length & 0xFF
 
-        # Prepare for burst read
-        ans = self.sendFrame(CMD_BURSTRD, cHigh, cLow)
-        if ans != ANS_READY:
-            raise IOError(
-                "Unable to prepare for burst-read! (Unknown response 0x%02x)" % ans
-            )
+            # Prepare for burst read
+            ans = self.sendFrame(CMD_BURSTRD, cHigh, cLow, raiseException=False)
 
-        data = self.ser.read(length)
+            if ans == -255:
+                self.burstReadOK = False
+            elif ans != ANS_READY:
+                raise IOError(
+                    "Unable to prepare for burst-read! (Unknown response 0x%02x)" % ans
+                )
 
-        self.readFrame(raiseException=True)
+        data = bytearray()
+
+        if self.burstReadOK:
+            data = self.ser.read(length)
+
+            self.readFrame(raiseException=True)
+        else:
+            # Read bytes
+            for i in range(0, length):
+                a = self.instr(0xE0)  # MOVX A,@DPTR
+                data.append(a)
+                a = self.instr(0xA3)  # INC DPTR
 
         return data
-
 
     def chipErase(self):
         """
