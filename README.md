@@ -39,7 +39,7 @@ Where `{DD}`, `{DC}` and `{RST}` are the pins on the CCxxxx chip and `<CC_DD_O>`
 
 In an arduino/breadboard set-up, this looks like this:
 
-<img src="https://raw.githubusercontent.com/wavesoft/CCLib/master/Schematic/arduino-wiring.png" width="550" />
+<img src="Schematic/arduino-wiring.png" width="550" />
 
 ### 2. Prepare your software
 
